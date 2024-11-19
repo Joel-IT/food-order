@@ -78,12 +78,14 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
         /* Allgemeine Einstellungen */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f1f1f1; /* Hellerer Hintergrund für bessere Lesbarkeit */
+            background: url('images/pexels-goumbik-616401.jpg') no-repeat center center fixed; /* Hintergrundbild */
+            background-size: cover; /* Bild skaliert sich, um die gesamte Seite zu bedecken */
             margin: 0;
             padding: 0;
             color: #333;
             line-height: 1.6;
         }
+
 
         .container {
             max-width: 1200px;

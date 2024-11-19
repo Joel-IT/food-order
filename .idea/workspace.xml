@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a2fbc706-de6a-4b42-9535-3c2a75007202" name="Changes" comment="dev">
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/index.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -74,6 +76,7 @@
       <recent name="C:\Users\Joelk\PhpstormProjects\food-order" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Joelk\PhpstormProjects\food-order" />
       <recent name="C:\Users\Joelk\PhpstormProjects\food-order\DatabaseFile" />
     </key>
   </component>
@@ -95,7 +98,9 @@
       <updated>1732029462520</updated>
       <workItem from="1732029464033" duration="2895000" />
       <workItem from="1732034586229" duration="2530000" />
-      <workItem from="1732041338726" duration="610000" />
+      <workItem from="1732041338726" duration="839000" />
+      <workItem from="1732042846097" duration="6000" />
+      <workItem from="1732042908435" duration="348000" />
     </task>
     <task id="LOCAL-00001" summary="dev">
       <option name="closed" value="true" />
@@ -161,7 +166,23 @@
       <option name="project" value="LOCAL" />
       <updated>1732038006210</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="dev">
+      <option name="closed" value="true" />
+      <created>1732042338990</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1732042338990</updated>
+    </task>
+    <task id="LOCAL-00010" summary="dev">
+      <option name="closed" value="true" />
+      <created>1732042417681</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1732042417681</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
