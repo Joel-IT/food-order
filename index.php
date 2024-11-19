@@ -18,13 +18,13 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['first_name'], $_POST['last_name'])) {
     $_SESSION['first_name'] = $_POST['first_name'];
     $_SESSION['last_name'] = $_POST['last_name'];
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit; // Wichtig: Script nach Weiterleitung beenden
 }
 
-// Überprüfen, ob Benutzername und Nachname gesetzt sind
-if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
-    // Bestellungen hinzufügen
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['menu_id'], $_POST['quantity'], $_POST['confirm_order'])) {
-        // Bestellung bestätigen
+// Bestellung hinzufügen
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['menu_id'], $_POST['quantity'], $_POST['confirm_order'])) {
+    if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
         $menu_id = $_POST['menu_id'];
         $quantity = $_POST['quantity'];
 
@@ -39,29 +39,32 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
 
         // Setze eine Session-Variable für die Bestellbestätigung
         $_SESSION['order_success'] = 'Bestellung erfolgreich!';
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit; // Wichtig: Script nach Weiterleitung beenden
     }
+}
 
+// Überprüfen, ob Benutzername und Nachname gesetzt sind
+$menu = [];
+$orders = [];
+$total = 0;
+
+if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
     // Bestellungen anzeigen
-    $orders = $pdo->prepare("SELECT orders.*, menu.title, menu.price FROM orders JOIN menu ON orders.menu_id = menu.id WHERE orders.first_name = :first_name AND orders.last_name = :last_name");
-    $orders->execute([
+    $orders_stmt = $pdo->prepare("SELECT orders.*, menu.title, menu.price FROM orders JOIN menu ON orders.menu_id = menu.id WHERE orders.first_name = :first_name AND orders.last_name = :last_name");
+    $orders_stmt->execute([
         'first_name' => $_SESSION['first_name'],
         'last_name' => $_SESSION['last_name']
     ]);
-    $orders = $orders->fetchAll(PDO::FETCH_ASSOC);
+    $orders = $orders_stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Gesamtpreis berechnen
-    $total = 0;
     foreach ($orders as $order) {
         $total += $order['price'] * $order['quantity'];
     }
 
     // Menü abrufen
     $menu = $pdo->query("SELECT * FROM menu")->fetchAll(PDO::FETCH_ASSOC);
-} else {
-    // Fehlermeldung, wenn Name und Nachname noch nicht gesetzt sind
-    $menu = [];
-    $orders = [];
-    $total = 0;
 }
 ?>
 
@@ -291,26 +294,21 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
 
     </style>
     <script>
-        // Öffnet das Bestätigungsmodal
         function openModal(event, menuId, quantity) {
-            event.preventDefault(); // Verhindert das Absenden des Formulars
+            event.preventDefault();
 
-            // Setzt die Formularwerte in das Modal
             document.getElementById("menu_id_modal").value = menuId;
             document.getElementById("quantity_modal").value = quantity;
 
-            // Zeigt das Modal an
             document.getElementById("confirmationModal").style.display = "block";
         }
 
-        // Schließt das Modal
         function closeModal() {
             document.getElementById("confirmationModal").style.display = "none";
         }
 
-        // Bestätigt die Bestellung und sendet das Formular ab
         function confirmOrder() {
-            document.getElementById("orderForm").submit(); // Formular absenden
+            document.getElementById("orderForm").submit();
         }
     </script>
 </head>
@@ -325,39 +323,35 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
     </form>
 <?php else: ?>
     <h1>Bestellen</h1>
-    <p>Willkommen, <?= $_SESSION['first_name'] ?> <?= $_SESSION['last_name'] ?></p>
+    <p>Willkommen, <?= htmlspecialchars($_SESSION['first_name']) ?> <?= htmlspecialchars($_SESSION['last_name']) ?></p>
 
-    <!-- Bestellbestätigung anzeigen -->
     <?php if (isset($_SESSION['order_success'])): ?>
         <div class="order-success">
-            <p><?= $_SESSION['order_success']; ?></p>
+            <p><?= htmlspecialchars($_SESSION['order_success']) ?></p>
         </div>
         <?php unset($_SESSION['order_success']); ?>
     <?php endif; ?>
 
-    <!-- Menü anzeigen -->
     <h2>Menü</h2>
     <div class="menu-list">
         <?php foreach ($menu as $item): ?>
             <div class="menu-item">
-                <strong><?= $item['title'] ?></strong><br>
-                <span><?= $item['price'] ?>€</span><br>
-                <img src="<?= $item['image_url'] ?>" alt="<?= $item['title'] ?>">
-                <form method="post" onsubmit="openModal(event, <?= $item['id'] ?>, document.getElementById('quantity_<?= $item['id'] ?>').value)">
-                    <input type="hidden" name="menu_id" id="menu_id_<?= $item['id'] ?>" value="<?= $item['id'] ?>">
-                    <input type="number" id="quantity_<?= $item['id'] ?>" name="quantity" min="1" value="1" required>
+                <strong><?= htmlspecialchars($item['title']) ?></strong><br>
+                <span><?= htmlspecialchars($item['price']) ?>€</span><br>
+                <img src="<?= htmlspecialchars($item['image_url']) ?>" alt="<?= htmlspecialchars($item['title']) ?>">
+                <form method="post" onsubmit="openModal(event, <?= htmlspecialchars($item['id']) ?>, document.getElementById('quantity_<?= htmlspecialchars($item['id']) ?>').value)">
+                    <input type="hidden" name="menu_id" value="<?= htmlspecialchars($item['id']) ?>">
+                    <input type="number" id="quantity_<?= htmlspecialchars($item['id']) ?>" name="quantity" min="1" value="1" required>
                     <button type="submit">Bestellen</button>
                 </form>
             </div>
         <?php endforeach; ?>
     </div>
 
-    <!-- Bestellbestätigung Modal -->
     <div id="confirmationModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             <h2>Bestellung bestätigen</h2>
-            <p>Möchten Sie diese Bestellung wirklich absenden?</p>
             <form method="post" id="orderForm">
                 <input type="hidden" name="confirm_order" value="1">
                 <input type="hidden" name="menu_id" id="menu_id_modal">
@@ -368,21 +362,18 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
         </div>
     </div>
 
-    <!-- Meine Bestellungen anzeigen -->
     <h2>Meine Bestellungen</h2>
     <div class="order-list">
         <?php if (count($orders) > 0): ?>
             <?php foreach ($orders as $order): ?>
                 <div class="order-item">
-                    <p><strong>Gericht:</strong> <?= $order['title'] ?></p>
-                    <p><strong>Menge:</strong> <?= $order['quantity'] ?></p>
-                    <p><strong>Status:</strong> <?= $order['status'] ?></p>
+                    <p><strong>Gericht:</strong> <?= htmlspecialchars($order['title']) ?></p>
+                    <p><strong>Menge:</strong> <?= htmlspecialchars($order['quantity']) ?></p>
+                    <p><strong>Status:</strong> <?= htmlspecialchars($order['status']) ?></p>
                 </div>
             <?php endforeach; ?>
-
-            <!-- Gesamtpreis oben rechts -->
             <div class="total-price">
-                Gesamt: <?= $total ?>€
+                Gesamt: <?= htmlspecialchars($total) ?>€
             </div>
         <?php else: ?>
             <p>Noch keine Bestellungen!</p>
