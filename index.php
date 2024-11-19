@@ -4,8 +4,8 @@ session_start();  // Sitzungsstart, um die Benutzerdaten zu speichern
 // Verbindung zur Datenbank
 $host = 'localhost';
 $db = 'restaurant';
-$user = 'joel';
-$pass = '1442';
+$user = 'root';
+$pass = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
@@ -23,11 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['first_name'], $_POST[
 // Überprüfen, ob Benutzername und Nachname gesetzt sind
 if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
     // Bestellungen hinzufügen
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_order'])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['menu_id'], $_POST['quantity'], $_POST['confirm_order'])) {
+        // Bestellung bestätigen
         $menu_id = $_POST['menu_id'];
         $quantity = $_POST['quantity'];
 
-        // Bestellung bestätigen und in die Datenbank eintragen
+        // Bestellung in die Datenbank eintragen
         $stmt = $pdo->prepare("INSERT INTO orders (first_name, last_name, menu_id, quantity, status) VALUES (:first_name, :last_name, :menu_id, :quantity, 'In Bearbeitung')");
         $stmt->execute([
             'first_name' => $_SESSION['first_name'],
@@ -73,149 +74,245 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
     <style>
         /* Allgemeine Einstellungen */
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f1f1; /* Hellerer Hintergrund für bessere Lesbarkeit */
             margin: 0;
             padding: 0;
             color: #333;
+            line-height: 1.6;
         }
 
-        /* Container für die Seite */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px; /* Mehr Abstand für mehr Luft im Layout */
         }
 
-        /* Header */
+        /* Überschrift */
         h1, h2 {
-            font-size: 2em;
+            font-size: 2.5em;
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: bold;
         }
 
-        /* Bestellformular und Menüanzeige */
+        h1 {
+            font-size: 3em;
+            margin-top: 30px;
+        }
+
+        /* Eingabeformulare */
         form input, form button {
-            padding: 10px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 12px 20px;
+            margin: 12px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1.1em;
         }
 
         form button {
             background-color: #4CAF50;
             color: white;
             cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         form button:hover {
             background-color: #45a049;
+            transform: scale(1.05); /* Schaltflächen werden leicht größer bei Hover */
         }
 
-        form input[type="number"] {
-            width: 80px;
-            max-width: 100px;
-        }
-
-        input[type="text"], input[type="number"], button {
-            font-size: 16px;
-        }
-
-        /* Menüliste */
-        .menu-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .menu-item {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease-in-out;
-        }
-
-        .menu-item:hover {
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        }
-
-        .menu-item img {
-            width: 100%;
-            height: auto;
-            border-radius: 5px;
-            object-fit: cover;
-        }
-
-        /* Bestellungsliste */
-        .order-list {
-            margin-top: 40px;
-        }
-
-        .order-item {
-            background-color: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .order-item span {
-            font-weight: bold;
-        }
-
-        .order-item p {
-            margin: 5px 0;
+        form input:focus {
+            border-color: #4CAF50;
         }
 
         /* Bestellbestätigung */
         .order-success {
             background-color: #d4edda;
             color: #155724;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Menü-Item Stil */
+        .menu-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
             margin-top: 20px;
-            font-size: 1.2em;
         }
 
-        /* Eingabefelder und Buttons */
-        input[type="text"], input[type="number"], input[type="submit"], button {
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            font-size: 16px;
+        .menu-item {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+            text-align: center;
         }
 
-        input[type="text"], input[type="number"] {
-            width: 300px;
+        .menu-item:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
-        button {
+        .menu-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .menu-item strong {
+            font-size: 1.6em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .menu-item span {
+            font-size: 1.3em;
+            color: #666;
+        }
+
+        /* Modale Fenster */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 70%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        /* Gesamtpreis oben rechts */
+        .total-price {
+            position: absolute;
+            top: 30px;
+            right: 30px;
             background-color: #4CAF50;
             color: white;
-            cursor: pointer;
-            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.4em;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        button:hover {
-            background-color: #45a049;
+        .order-list {
+            margin-top: 40px;
+            position: relative; /* Container wird relativ positioniert */
+            padding-top: 50px; /* Platz schaffen für den fixierten Gesamtpreis */
         }
 
-        /* Responsivität */
+        .order-item {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-item p {
+            margin: 8px 0;
+        }
+
+        .order-item strong {
+            color: #333;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .menu-list {
-                grid-template-columns: 1fr 1fr;
+            .total-price {
+                font-size: 1.2em;
+                padding: 10px;
+                right: 10px;
+                top: 20px;
             }
-        }
 
-        @media (max-width: 480px) {
+            .order-list {
+                padding-top: 30px;
+            }
+
+            h1, h2 {
+                font-size: 2em;
+            }
+
             .menu-list {
                 grid-template-columns: 1fr;
+            }
+
+            .menu-item {
+                padding: 15px;
+            }
+
+            .modal-content {
+                width: 90%;
+            }
+
+            form input, form button {
+                font-size: 1em;
             }
         }
 
     </style>
+    <script>
+        // Öffnet das Bestätigungsmodal
+        function openModal(event, menuId, quantity) {
+            event.preventDefault(); // Verhindert das Absenden des Formulars
+
+            // Setzt die Formularwerte in das Modal
+            document.getElementById("menu_id_modal").value = menuId;
+            document.getElementById("quantity_modal").value = quantity;
+
+            // Zeigt das Modal an
+            document.getElementById("confirmationModal").style.display = "block";
+        }
+
+        // Schließt das Modal
+        function closeModal() {
+            document.getElementById("confirmationModal").style.display = "none";
+        }
+
+        // Bestätigt die Bestellung und sendet das Formular ab
+        function confirmOrder() {
+            document.getElementById("orderForm").submit(); // Formular absenden
+        }
+    </script>
 </head>
 <body>
 
@@ -224,7 +321,7 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
     <form method="post">
         <input type="text" name="first_name" placeholder="Vorname" required>
         <input type="text" name="last_name" placeholder="Nachname" required>
-        <button type="submit" class="btn">Bestätigen</button>
+        <button type="submit">Bestätigen</button>
     </form>
 <?php else: ?>
     <h1>Bestellen</h1>
@@ -243,18 +340,32 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
     <div class="menu-list">
         <?php foreach ($menu as $item): ?>
             <div class="menu-item">
-                <div>
-                    <strong><?= $item['title'] ?></strong><br>
-                    <span><?= $item['price'] ?>€</span>
-                </div>
+                <strong><?= $item['title'] ?></strong><br>
+                <span><?= $item['price'] ?>€</span><br>
                 <img src="<?= $item['image_url'] ?>" alt="<?= $item['title'] ?>">
-                <form method="post" onsubmit="return showConfirmModal(event)">
-                    <input type="hidden" name="menu_id" value="<?= $item['id'] ?>">
-                    <input type="number" name="quantity" min="1" value="1" required>
-                    <button type="submit" class="btn">Bestellen</button>
+                <form method="post" onsubmit="openModal(event, <?= $item['id'] ?>, document.getElementById('quantity_<?= $item['id'] ?>').value)">
+                    <input type="hidden" name="menu_id" id="menu_id_<?= $item['id'] ?>" value="<?= $item['id'] ?>">
+                    <input type="number" id="quantity_<?= $item['id'] ?>" name="quantity" min="1" value="1" required>
+                    <button type="submit">Bestellen</button>
                 </form>
             </div>
         <?php endforeach; ?>
+    </div>
+
+    <!-- Bestellbestätigung Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Bestellung bestätigen</h2>
+            <p>Möchten Sie diese Bestellung wirklich absenden?</p>
+            <form method="post" id="orderForm">
+                <input type="hidden" name="confirm_order" value="1">
+                <input type="hidden" name="menu_id" id="menu_id_modal">
+                <input type="hidden" name="quantity" id="quantity_modal">
+                <button type="button" onclick="confirmOrder()">Ja, Bestellung abschicken</button>
+                <button type="button" onclick="closeModal()">Abbrechen</button>
+            </form>
+        </div>
     </div>
 
     <!-- Meine Bestellungen anzeigen -->
@@ -268,7 +379,11 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
                     <p><strong>Status:</strong> <?= $order['status'] ?></p>
                 </div>
             <?php endforeach; ?>
-            <h3>Gesamt: <?= $total ?>€</h3>
+
+            <!-- Gesamtpreis oben rechts -->
+            <div class="total-price">
+                Gesamt: <?= $total ?>€
+            </div>
         <?php else: ?>
             <p>Noch keine Bestellungen!</p>
         <?php endif; ?>
