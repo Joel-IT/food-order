@@ -39,7 +39,7 @@ CREATE TABLE `menu` (
 --
 
 INSERT INTO `menu` (`id`, `title`, `image_url`, `price`) VALUES
-(1, 'Burger', 'images/Burger_selber_machen_rezept.jpg', 0.00),
+(1, 'Burger', 'images/Burger_selber_machen_rezept.jpg', 12.99),
 (2, 'Pizza', 'images/Pizza-Salami-1200x900.jpg', 7.99),
 (3, 'Pasta', 'https://www.bhg.com/thmb/NpcM7dD1zoqwlJZZ_V3eUyf1goQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Spaghetti_pasta-2f206dff764b40658b049e871c62b06d.jpg', 6.49),
 (4, 'Sushi', 'https://www.sushiworld.com.au/wp-content/uploads/2021/02/sushi_chef.jpg', 8.99),
