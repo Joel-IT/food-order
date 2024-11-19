@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 19. Nov 2024 um 17:37
+-- Erstellungszeit: 19. Nov 2024 um 20:51
 -- Server-Version: 10.4.28-MariaDB
 -- PHP-Version: 8.2.4
 
@@ -39,8 +39,8 @@ CREATE TABLE `menu` (
 --
 
 INSERT INTO `menu` (`id`, `title`, `image_url`, `price`) VALUES
-(1, 'Burger', 'https://www.simplyrecipes.com/thmb/JG48hOXNhvVq3XtP-TkGxNKCoKg=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Simply-Recipes-Cheeseburger-Lead-4-bff2267bcf974ab988fb53cba97be4a5.jpg', 5.99),
-(2, 'Pizza', 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Pizza_with_salami.jpg', 7.99),
+(1, 'Burger', 'images/Burger_selber_machen_rezept.jpg', 0.00),
+(2, 'Pizza', 'images/Pizza-Salami-1200x900.jpg', 7.99),
 (3, 'Pasta', 'https://www.bhg.com/thmb/NpcM7dD1zoqwlJZZ_V3eUyf1goQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Spaghetti_pasta-2f206dff764b40658b049e871c62b06d.jpg', 6.49),
 (4, 'Sushi', 'https://www.sushiworld.com.au/wp-content/uploads/2021/02/sushi_chef.jpg', 8.99),
 (5, 'Salad', 'https://www.simplyrecipes.com/thmb/aXt-k1l8KkU01_Udfz7nWLzUbf8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/SimplyRecipes-Salad-Image-9d6b0004ea144a62a84e3b8647eeb0ca.jpg', 4.99),
@@ -68,8 +68,7 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `table_number`, `menu_id`, `quantity`, `status`, `order_time`, `first_name`, `last_name`) VALUES
-(7, 0, 1, 1, 'Zubereitet', '2024-11-19 16:34:18', 'test', 'test'),
-(8, 0, 1, 1, 'In Bearbeitung', '2024-11-19 16:36:44', 'test', 'test');
+(37, 0, 2, 1, 'In Bearbeitung', '2024-11-19 19:50:40', 'shas', 'ass');
 
 --
 -- Indizes der exportierten Tabellen
@@ -102,7 +101,7 @@ ALTER TABLE `menu`
 -- AUTO_INCREMENT für Tabelle `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- Constraints der exportierten Tabellen
