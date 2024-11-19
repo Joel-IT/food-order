@@ -3,8 +3,8 @@ session_start();
 
 $host = 'localhost';
 $db = 'restaurant';
-$user = 'root';
-$pass = '';
+$user = 'joel';
+$pass = '1442';
 
 // Verbindung zur Datenbank
 try {

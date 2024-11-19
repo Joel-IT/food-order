@@ -4,8 +4,8 @@ session_start();  // Sitzungsstart, um die Benutzerdaten zu speichern
 // Verbindung zur Datenbank
 $host = 'localhost';
 $db = 'restaurant';
-$user = 'root';
-$pass = '';
+$user = 'joel';
+$pass = '1442';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
@@ -36,7 +36,8 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
             'quantity' => $quantity
         ]);
 
-        echo "<script>alert('Bestellung erfolgreich!'); window.location='index.php';</script>";
+        // Setze eine Session-Variable für die Bestellbestätigung
+        $_SESSION['order_success'] = 'Bestellung erfolgreich!';
     }
 
     // Bestellungen anzeigen
@@ -168,61 +169,14 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
             margin: 5px 0;
         }
 
-        /* Bestellbestätigung Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            padding-top: 60px;
-        }
-
-        .modal-content {
-            background-color: #fff;
-            margin: 5% auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 50%;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal h2 {
-            margin-top: 0;
-        }
-
-        .modal .btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            margin: 10px;
-            cursor: pointer;
-            border: none;
+        /* Bestellbestätigung */
+        .order-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
             border-radius: 5px;
-        }
-
-        .modal .btn-danger {
-            background-color: red;
-        }
-
-        .modal .btn:hover, .modal .btn-danger:hover {
-            opacity: 0.8;
-        }
-
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            float: right;
-            cursor: pointer;
-        }
-
-        .close:hover, .close:focus {
-            color: black;
-            text-decoration: none;
+            margin-top: 20px;
+            font-size: 1.2em;
         }
 
         /* Eingabefelder und Buttons */
@@ -248,55 +202,16 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
             background-color: #45a049;
         }
 
-        /* Styling für die Bestellübersicht */
-        .order-list {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .order-item {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .order-item p {
-            margin: 5px 0;
-        }
-
-        .order-item span {
-            font-weight: bold;
-        }
-
         /* Responsivität */
         @media (max-width: 768px) {
             .menu-list {
                 grid-template-columns: 1fr 1fr;
-            }
-
-            .modal-content {
-                width: 90%;
-            }
-
-            input[type="text"], input[type="number"] {
-                width: 100%;
             }
         }
 
         @media (max-width: 480px) {
             .menu-list {
                 grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                width: 90%;
-            }
-
-            input[type="text"], input[type="number"] {
-                width: 100%;
             }
         }
 
@@ -314,6 +229,14 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
 <?php else: ?>
     <h1>Bestellen</h1>
     <p>Willkommen, <?= $_SESSION['first_name'] ?> <?= $_SESSION['last_name'] ?></p>
+
+    <!-- Bestellbestätigung anzeigen -->
+    <?php if (isset($_SESSION['order_success'])): ?>
+        <div class="order-success">
+            <p><?= $_SESSION['order_success']; ?></p>
+        </div>
+        <?php unset($_SESSION['order_success']); ?>
+    <?php endif; ?>
 
     <!-- Menü anzeigen -->
     <h2>Menü</h2>
@@ -345,42 +268,11 @@ if (isset($_SESSION['first_name'], $_SESSION['last_name'])) {
                     <p><strong>Status:</strong> <?= $order['status'] ?></p>
                 </div>
             <?php endforeach; ?>
-            <p><strong>Gesamtpreis: <?= number_format($total, 2, ',', '.') ?>€</strong></p>
+            <h3>Gesamt: <?= $total ?>€</h3>
         <?php else: ?>
-            <p>Du hast noch keine Bestellungen aufgegeben.</p>
+            <p>Noch keine Bestellungen!</p>
         <?php endif; ?>
     </div>
-
-    <!-- Modal für Bestellbestätigung -->
-    <div id="confirmModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Bestellung bestätigen</h2>
-            <p>Willst du diese Bestellung wirklich aufgeben?</p>
-            <form id="confirmForm" method="post">
-                <input type="hidden" name="menu_id" id="modalMenuId">
-                <input type="hidden" name="quantity" id="modalQuantity">
-                <button type="submit" name="confirm_order" class="btn">Bestätigen</button>
-                <button type="button" class="btn btn-danger" onclick="closeModal()">Abbrechen</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function showConfirmModal(event) {
-            event.preventDefault();
-            const menuId = event.target.querySelector('input[name="menu_id"]').value;
-            const quantity = event.target.querySelector('input[name="quantity"]').value;
-
-            document.getElementById('modalMenuId').value = menuId;
-            document.getElementById('modalQuantity').value = quantity;
-            document.getElementById('confirmModal').style.display = "block";
-        }
-
-        function closeModal() {
-            document.getElementById('confirmModal').style.display = "none";
-        }
-    </script>
 <?php endif; ?>
 
 </body>
